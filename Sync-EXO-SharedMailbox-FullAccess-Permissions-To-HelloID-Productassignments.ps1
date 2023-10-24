@@ -477,7 +477,7 @@ try {
         throw "No Users have been found"
     }
 
-    $exoUsersGroupedOnUserPrincipalName = $exoUsers | Group-Object UserPrincipalName -AsHashTable
+    $exoUsersGroupedOnUserPrincipalName = $exoUsers | Group-Object UserPrincipalName -AsHashTable -AsString
 
     Hid-Write-Status -Event Success -Message "Successfully queried Exchange Online Users. Result count: $(($exoUsers | Measure-Object).Count)"
 }
@@ -503,8 +503,7 @@ try {
                 Name              = $exoMailbox.Name
                 UserPrincipalName = $exoMailbox.UserPrincipalName
                 Id                = $exoMailbox.Id
-                # Only keep letters and digits and convert to upper case, as HelloID product sku only consists of those
-                Guid              = ($exoMailbox.Guid -replace "\W").ToUpper()
+                Guid              = $exoMailbox.Guid
                 Users             = [System.Collections.ArrayList]@()
             }
 
@@ -520,7 +519,7 @@ try {
                 # list of al the users in the mailbox. This includes the groups member from the mailbox
                 if ($null -ne $fullAccessPermission.User) {
                     $fullAccessUser = $null
-                    $fullAccessUser = $exoUsersGroupedOnUserPrincipalName[$($fullAccessPermission.user)]
+                    $fullAccessUser = $exoUsersGroupedOnUserPrincipalName["$($fullAccessPermission.user)"]
                     if ($null -ne $fullAccessUser) {
                         $userWithFullAccessObject = [PSCustomObject]@{
                             Id                = $fullAccessUser.id
@@ -575,9 +574,9 @@ try {
         # }
 
         # Get Group from Product Action
-        $exoMailboxGuid = [Guid]::New(($product.code.replace("$ProductSkuPrefix","")))
+        $exoMailboxGuid = [Guid]::New(($product.code.replace("$ProductSkuPrefix", "")))
         $exoMailbox = $null
-        $exoMailbox = $exoMailboxesWithFullAccessUsersGrouped[$exoMailboxGuid]
+        $exoMailbox = $exoMailboxesWithFullAccessUsersGrouped["$($exoMailboxGuid)"]
         if (($exoMailbox | Measure-Object).Count -eq 0) {
             Hid-Write-Status -Event Error -Message "No Exchange Online Mailbox found with Guid [$($exoMailboxGuid)] for Product [$($product.name)]"
             continue
@@ -594,7 +593,7 @@ try {
         $productUsersInScope = [System.Collections.ArrayList]@()
         foreach ($exoUser in $exoUsersInScope) {
             $helloIDUser = $null
-            $helloIDUser = $helloIDUsersGrouped[$exoUser.$exoUserCorrelationProperty]
+            $helloIDUser = $helloIDUsersGrouped["$($exoUser.$exoUserCorrelationProperty)"]
 
             if (($helloIDUser | Measure-Object).Count -eq 0) {
                 if ($verboseLogging -eq $true) {
@@ -610,7 +609,7 @@ try {
         # Get current product assignments
         $currentProductassignments = $null
         if (($helloIDSelfServiceProductassignmentsInScope | Measure-Object).Count -ge 1) {
-            $currentProductassignments = $helloIDSelfServiceProductassignmentsInScopeGrouped[$product.productId]
+            $currentProductassignments = $helloIDSelfServiceProductassignmentsInScopeGrouped["$($product.productId)"]
         }
 
         # Define assignments to grant
