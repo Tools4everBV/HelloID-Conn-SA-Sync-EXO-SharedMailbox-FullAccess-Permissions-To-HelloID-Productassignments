@@ -481,7 +481,7 @@ try {
 
     Hid-Write-Status -Event Success -Message "Successfully queried Exchange Online Users. Result count: $(($exoUsers | Measure-Object).Count)"
 }
-catch { 
+catch {
     $ex = $PSItem
     $errorMessage = Get-ErrorMessage -ErrorObject $ex
 
@@ -489,7 +489,7 @@ catch {
 
     throw "Error querying all Exchange users. Error Message: $($errorMessage.AuditErrorMessage)"
 }
-#endregion Get Exchange online groups
+#endregion Get Exchange online users
 
 #region Get permissions to Shared Mailbox
 try {
@@ -575,7 +575,7 @@ try {
         # }
 
         # Get Group from Product Action
-        $exoMailboxGuid = $product.code.replace("$ProductSkuPrefix", "")
+        $exoMailboxGuid = [Guid]::New(($product.code.replace("$ProductSkuPrefix","")))
         $exoMailbox = $null
         $exoMailbox = $exoMailboxesWithFullAccessUsersGrouped[$exoMailboxGuid]
         if (($exoMailbox | Measure-Object).Count -eq 0) {
