@@ -1,7 +1,7 @@
 #####################################################
 # HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments
 #
-# Version: 1.0.0
+# Version: 1.1.0
 #####################################################
 # Set to false to acutally perform actions - Only run as DryRun when testing/troubleshooting!
 $dryRun = $false
@@ -25,10 +25,10 @@ $WarningPreference = "Continue"
 # $portalApiSecret = "" # Set from Global Variable
 
 # Exchange Online Connection Configuration
-# $AzureADOrganization = "" # Set from Global Variable
-# $AzureADtenantID = "" # Set from Global Variable
-# $AzureADAppId = "" # Set from Global Variable
-# $AzureADAppSecret = "" # Set from Global Variable
+# $EntraOrganization = "" # Set from Global Variable
+# $EntraTenantID = "" # Set from Global Variable
+# $EntraAppID = "" # Set from Global Variable
+# $EntraAppSecret = "" # Set from Global Variable
 $exchangeMailboxesFilter = "DisplayName -like 'shared-*'" # Optional, when no filter is provided ($exchangeMailboxesFilter = $null), all mailboxes will be queried
 
 # PowerShell commands to import
@@ -391,12 +391,12 @@ try {
     Write-Verbose "Creating Access Token"
 
     $baseUri = "https://login.microsoftonline.com/"
-    $authUri = $baseUri + "$AzureADTenantId/oauth2/token"
+    $authUri = $baseUri + "$EntraTenantID/oauth2/token"
     
     $body = @{
         grant_type    = "client_credentials"
-        client_id     = "$AzureADAppID"
-        client_secret = "$AzureADAppSecret"
+        client_id     = "$EntraAppID"
+        client_secret = "$EntraAppSecret"
         resource      = "https://outlook.office365.com"
     }
     
@@ -407,8 +407,8 @@ try {
     Write-Verbose "Connecting to Exchange Online"
 
     $exchangeSessionParams = @{
-        Organization     = $AzureADOrganization
-        AppID            = $AzureADAppID
+        Organization     = $EntraOrganization
+        AppID            = $EntraAppID
         AccessToken      = $accessToken
         CommandName      = $exchangeOnlineCommands
         ShowBanner       = $false
@@ -441,14 +441,24 @@ try {
         , "RecipientTypeDetails"
     )
 
-    $exchangeQuerySplatParams = @{
-        Filter               = $exchangeMailboxesFilter
-        Properties           = $properties
-        RecipientTypeDetails = "SharedMailbox"
-        ResultSize           = "Unlimited"
+    if ($exchangeMailboxesFilter -eq $null) {
+        $exchangeQuerySplatParams = @{
+            Properties           = $properties
+            RecipientTypeDetails = "SharedMailbox"
+            ResultSize           = "Unlimited"
+        }
+        Hid-Write-Status -Event Information -Message "Querying Exchange Online Shared Mailboxes"
+    }
+    else {
+        $exchangeQuerySplatParams = @{
+            Filter               = $exchangeMailboxesFilter
+            Properties           = $properties
+            RecipientTypeDetails = "SharedMailbox"
+            ResultSize           = "Unlimited"
+        } 
+        Hid-Write-Status -Event Information -Message "Querying Exchange Online Shared Mailboxes that match filter [$($exchangeQuerySplatParams.Filter)]"
     }
 
-    Write-Verbose "Querying Exchange Online Shared Mailboxes that match filter [$($exchangeQuerySplatParams.Filter)]"
     $exoMailboxes = Get-EXOMailbox @exchangeQuerySplatParams | Select-Object $properties
 
     if (($exoMailboxes | Measure-Object).Count -eq 0) {
