@@ -6,9 +6,9 @@ Synchronize Exchange Online Shared Mailbox Full Access Permissions to HelloID Se
 <a href="https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments/issues"><img src="https://img.shields.io/github/issues/Tools4everBV/HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments" alt="Issues Badge"/></a>
 <a href="https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/Tools4everBV/HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments?color=2b9348"></a>
 
-| :information_source: Information |
-|:---------------------------|
-| This repository contains the connector and configuration code only. The implementer is responsible to acquire the connection details such as username, password, certificate, etc. You might even need to sign a contract or agreement with the supplier before implementing this connector. Please contact the client's application manager to coordinate the connector requirements.       |
+| :information_source: Information                                                                                                                                                                                                                                                                                                                                                       |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| This repository contains the connector and configuration code only. The implementer is responsible to acquire the connection details such as username, password, certificate, etc. You might even need to sign a contract or agreement with the supplier before implementing this connector. Please contact the client's application manager to coordinate the connector requirements. |
 
 ## Table of Contents
 - [HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments](#helloid-conn-sa-sync-exo-sharedmailbox-fullaccess-permissions-to-helloid-productassignments)
@@ -18,11 +18,11 @@ Synchronize Exchange Online Shared Mailbox Full Access Permissions to HelloID Se
   - [Getting started](#getting-started)
     - [Create an API key and secret for HelloID](#create-an-api-key-and-secret-for-helloid)
     - [Installing the Microsoft Exchange Online PowerShell V3.1 module](#installing-the-microsoft-exchange-online-powershell-v31-module)
-    - [Getting the Azure AD graph API access](#getting-the-azure-ad-graph-api-access)
-      - [Creating the Azure AD App Registration and certificate](#creating-the-azure-ad-app-registration-and-certificate)
+    - [Getting the Microsoft Entra ID graph API access](#getting-the-microsoft-entra-id-graph-api-access)
+      - [Creating the Microsoft Entra ID App Registration and certificate](#creating-the-microsoft-entra-id-app-registration-and-certificate)
       - [Application Registration](#application-registration)
       - [Configuring App Permissions](#configuring-app-permissions)
-      - [Assign Azure AD roles to the application](#assign-azure-ad-roles-to-the-application)
+      - [Assign Microsoft Entra ID roles to the application](#assign-microsoft-entra-id-roles-to-the-application)
       - [Authentication and Authorization](#authentication-and-authorization)
     - [Synchronization settings](#synchronization-settings)
   - [Remarks](#remarks)
@@ -33,7 +33,7 @@ Synchronize Exchange Online Shared Mailbox Full Access Permissions to HelloID Se
 - Make sure you have Windows PowerShell 5.1 installed on the server where the HelloID agent and Service Automation agent are running.
 - Installed and available **Microsoft Exchange Online PowerShell V3.1 module**. Please see the [Microsoft documentation](https://learn.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-v2?view=exchange-ps) for more information. The download [can be found here](https://www.powershellgallery.com/packages/ExchangeOnlineManagement/3.0.0).
 - Required to run **On-Premises** since it is not allowed to import a module with the Cloud Agent.
-- An **App Registration in Azure AD** is required.
+- An **App Registration in Microsoft Entra ID** is required.
 - Make sure the sychronization is configured to meet your requirements.
 
 ## Introduction
@@ -60,8 +60,8 @@ This is intended for scenarios where the groupmemberships are managed by other s
 Since we use the cmdlets from the Microsoft Exchange Online PowerShell module, it is required this module is installed and available for the service account.
 Please follow the [Microsoft documentation on how to install the module](https://learn.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-v2?view=exchange-ps#install-and-maintain-the-exchange-online-powershell-module). 
 
-### Getting the Azure AD graph API access
-#### Creating the Azure AD App Registration and certificate
+### Getting the Microsoft Entra ID graph API access
+#### Creating the Microsoft Entra ID App Registration and certificate
 > _The steps below are based on the [Microsoft documentation](https://docs.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps) as of the moment of release. The Microsoft documentation should always be leading and is susceptible to change. The steps below might not reflect those changes._
 > >**Please note that our steps differ from the current documentation as we use Access Token Based Authentication instead of Certificate Based Authentication**
 
@@ -88,8 +88,8 @@ The [Microsoft Graph documentation](https://docs.microsoft.com/en-us/graph) prov
   *	Manage Exchange As Application ***Exchange.ManageAsApp***
 * To grant admin consent to our application press the “**Grant admin consent for TENANT**” button.
 
-#### Assign Azure AD roles to the application
-Azure AD has more than 50 admin roles available. The **Exchange Administrator** role should provide the required permissions for any task in Exchange Online PowerShell. However, some actions may not be allowed, such as managing other admin accounts, for this the Global Administrator would be required. and Exchange Administrator roles. Please note that the required role may vary based on your configuration.
+#### Assign Microsoft Entra ID roles to the application
+Microsoft Entra ID has more than 50 admin roles available. The **Exchange Administrator** role should provide the required permissions for any task in Exchange Online PowerShell. However, some actions may not be allowed, such as managing other admin accounts, for this the Global Administrator would be required. and Exchange Administrator roles. Please note that the required role may vary based on your configuration.
 * To assign the role(s) to your application, navigate to **Azure Portal > Azure Active Directory > Roles and administrators**.
 * On the Roles and administrators page that opens, find and select one of the supported roles e.g. “**Exchange Administrator**” by clicking on the name of the role (not the check box) in the results.
 * On the Assignments page that opens, click the “**Add assignments**” button.
@@ -116,19 +116,20 @@ There are multiple ways to authenticate to the Graph API with each has its own p
 *	At last we need to get the **Tenant ID**. This can be found in the Azure Portal by going to **Azure Active Directory > Overview**.
 
 ### Synchronization settings
-| Variable name | Description   | Notes |
-| ------------- | -----------   | ----- |
-| $portalBaseUrl    | String value of HelloID Base Url  | (Default Global Variable) |
-| $portalApiKey | String value of HelloID Api Key   | (Default Global Variable) |
-| $portalApiSecret  | String value of HelloID Api Secret    | (Default Global Variable) |
-| $AzureADtenantID    | String value of Azure AD Tenant ID  | Recommended to set as Global Variable |
-| $AzureADAppId | String value of Azure AD App ID  | Recommended to set as Global Variable |
-| $AzureADAppSecret  | String value of Azure AD App Secret  | Recommended to set as Global Variable |
-| $exchangeMailboxesFilter   | String value of seachfilter of which Exchange shared mailboxes to include   | Optional, when no filter is provided ($exchangeMailboxesFilter = $null), all shared mailboxes will be queried. This should match the filter used in the configuration of the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products)  |
-| $ProductSkuPrefix | String value of prefix filter of which HelloID Self service Products to include    | Optional, when no SkuPrefix is provided ($ProductSkuPrefix = $null), all products will be queried |
-| $PowerShellActionName | String value of name of the PowerShell action that grants the EXO user Full Access to the Shared Mailbox | The default value ("Grant-FullAccessPermissionToMailbox") is set to match the value from the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products)   |
-| $helloIDUserCorrelationProperty   | String value of name of the property of HelloID users to match to EXO users    | The default value ("username") is set to match the value from the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products), where the Exchange user UserPrincipalName is set to the HelloID User username. If your users are from a different source, change this accordingly   |
-| $exoUserCorrelationProperty    | String value of name of the property of EXO users to match to HelloID users    | The default value ("userPrincipalName") is set to match the value from the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products), where the EXO user UserPrincipalName is set to the HelloID User username. If your users are from a different source, change this accordingly  |
+| Variable name                   | Description                                                                                              | Notes                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| $portalBaseUrl                  | String value of HelloID Base Url                                                                         | (Default Global Variable)                                                                                                                                                                                                                                                                                                                                                                |
+| $portalApiKey                   | String value of HelloID Api Key                                                                          | (Default Global Variable)                                                                                                                                                                                                                                                                                                                                                                |
+| $portalApiSecret                | String value of HelloID Api Secret                                                                       | (Default Global Variable)                                                                                                                                                                                                                                                                                                                                                                |
+| $EntraOrganization              | String value of Microsoft Entra ID Organization                                                          | Recommended to set as Global Variable                                                                                                                                                                                                                                                                                                                                                    |
+| $EntraTenantID                  | String value of Microsoft Entra ID Tenant ID                                                             | Recommended to set as Global Variable                                                                                                                                                                                                                                                                                                                                                    |
+| $EntraAppID                     | String value of Microsoft Entra ID App ID                                                                | Recommended to set as Global Variable                                                                                                                                                                                                                                                                                                                                                    |
+| $EntraAppSecret                 | String value of Microsoft Entra ID App Secret                                                            | Recommended to set as Global Variable                                                                                                                                                                                                                                                                                                                                                    |
+| $exchangeMailboxesFilter        | String value of seachfilter of which Exchange shared mailboxes to include                                | Optional, when no filter is provided ($exchangeMailboxesFilter = $null), all shared mailboxes will be queried. This should match the filter used in the configuration of the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products)                                             |
+| $ProductSkuPrefix               | String value of prefix filter of which HelloID Self service Products to include                          | Optional, when no SkuPrefix is provided ($ProductSkuPrefix = $null), all products will be queried                                                                                                                                                                                                                                                                                        |
+| $PowerShellActionName           | String value of name of the PowerShell action that grants the EXO user Full Access to the Shared Mailbox | The default value ("Grant-FullAccessPermissionToMailbox") is set to match the value from the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products)                                                                                                                             |
+| $helloIDUserCorrelationProperty | String value of name of the property of HelloID users to match to EXO users                              | The default value ("username") is set to match the value from the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products), where the Exchange user UserPrincipalName is set to the HelloID User username. If your users are from a different source, change this accordingly     |
+| $exoUserCorrelationProperty     | String value of name of the property of EXO users to match to HelloID users                              | The default value ("userPrincipalName") is set to match the value from the [Exchange Online Shared Mailboxes to Products Sync](https://github.com/Tools4everBV/HelloID-Conn-SA-Sync-Exchange-Online-SharedMailbox-To-SelfService-Products), where the EXO user UserPrincipalName is set to the HelloID User username. If your users are from a different source, change this accordingly |
 
 
 ## Remarks
