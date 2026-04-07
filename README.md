@@ -16,7 +16,7 @@ Synchronize Exchange Online Shared Mailbox Full Access Permissions to HelloID Se
   - [Requirements](#requirements)
   - [Introduction](#introduction)
   - [Getting started](#getting-started)
-    - [Create an API key and secret for HelloID](#create-an-api-key-and-secret-for-helloid)
+    - [App Registration & Certificate Setup](#app-registration-&-certificate-setup)
     - [Installing the Microsoft Exchange Online PowerShell V3.1 module](#installing-the-microsoft-exchange-online-powershell-v31-module)
     - [Getting the Microsoft Entra ID graph API access](#getting-the-microsoft-entra-id-graph-api-access)
       - [Creating the Microsoft Entra ID App Registration and certificate](#creating-the-microsoft-entra-id-app-registration-and-certificate)
@@ -47,13 +47,39 @@ This is intended for scenarios where the groupmemberships are managed by other s
 
 ## Getting started
 
-### Create an API key and secret for HelloID
-1. Go to the `Manage portal > Security > API` section.
-2. Click on the `Add Api key` button to create a new API key.
-3. Optionally, you can add a note that will describe the purpose of this API key
-4. Optionally, you can restrict the IP addresses from which this API key can be used.
-5. Click on the `Save` button to save the API key.
-6. Go to the `Manage portal > Automation > Variable library` section and confim that the auto variables specified in the [connection settings](#connection-settings) are available.
+##### App Registration & Certificate Setup
+
+Before implementing this connector, make sure to configure a Microsoft Entra ID App Registration. During the setup process, you'll create a new App Registration in the Entra portal, assign the necessary API permissions, and generate and assign a certificate.
+
+Follow the official Microsoft documentation for creating an App Registration and setting up certificate-based authentication:
+
+- [App-only authentication with certificate (Exchange Online)](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#set-up-app-only-authentication)
+
+#### HelloID-specific configuration
+
+Once you have completed the Microsoft setup and followed their best practices, configure the following HelloID-specific requirements.
+
+- **API Permissions** (Application permissions):
+  - `User.Read.All` - To validate email uniqueness by listing users via Graph API
+  - `Domain.Read.All` - To retrieve verified domains for the mail domain dropdown
+  - `Exchange.ManageAsApp` - To create and manage shared mailboxes
+- **Entra ID Role assignment:**
+  - Assign the **Exchange Administrator** role to the App Registration
+- **Certificate:**
+  - Upload the public key file (.cer) in Entra ID
+  - Provide the certificate as a Base64 string in HelloID. For instructions on creating the certificate and obtaining the base64 string, refer to our forum post: [Setting up a certificate for Microsoft Graph API in HelloID connectors](https://forum.helloid.com/forum/helloid-provisioning/5338-instruction-setting-up-a-certificate-for-microsoft-graph-api-in-helloid-connectors#post5338)
+
+### Connection settings
+
+The following global variables must be configured in HelloID when importing and configuring the delegated form.
+
+| Setting | Description | Mandatory |
+| --- | --- | --- |
+| EntraIdOrganization | The Entra organization name (domain) | Yes |
+| EntraIdTenantId | The Entra tenant ID (GUID) | Yes |
+| EntraIdAppId | The unique identifier (ID) of the App Registration in Microsoft Entra ID | Yes |
+| EntraIdCertificateBase64String | The Base64-encoded string representation of the app certificate | Yes |
+| EntraIdCertificatePassword | The password associated with the app certificate | Yes |
 
 
 ### Installing the Microsoft Exchange Online PowerShell V3.1 module
@@ -102,18 +128,6 @@ For more information about the permissions, please see the Microsoft docs:
 * [Find the permissions required to run any Exchange cmdlet](https://learn.microsoft.com/en-us/powershell/exchange/find-exchange-cmdlet-permissions?view=exchange-ps).
 * [View and assign administrator roles in Azure Active Directory](https://learn.microsoft.com/en-us/powershell/exchange/find-exchange-cmdlet-permissions?view=exchange-ps).
 
-#### Authentication and Authorization
-There are multiple ways to authenticate to the Graph API with each has its own pros and cons, in this example we are using the Authorization Code grant type.
-
-*	First we need to get the **Client ID**, go to the **Azure Portal > Azure Active Directory > App Registrations**.
-*	Select your application and copy the Application (client) ID value.
-*	After we have the Client ID we also have to create a **Client Secret**.
-*	From the Azure Portal, go to **Azure Active Directory > App Registrations**.
-*	Select the application we have created before, and select "**Certificates and Secrets**". 
-*	Under “Client Secrets” click on the “**New Client Secret**” button to create a new secret.
-*	Provide a logical name for your secret in the Description field, and select the expiration date for your secret.
-*	It's IMPORTANT to copy the newly generated client secret, because you cannot see the value anymore after you close the page.
-*	At last we need to get the **Tenant ID**. This can be found in the Azure Portal by going to **Azure Active Directory > Overview**.
 
 ### Synchronization settings
 | Variable name                   | Description                                                                                              | Notes                                                                                                                                                                                                                                                                                                                                                                                    |
