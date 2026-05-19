@@ -1,7 +1,7 @@
 #####################################################
 # HelloID-Conn-SA-Sync-EXO-SharedMailbox-FullAccess-Permissions-To-HelloID-Productassignments
 #
-# Version: 1.1.1
+# Version: 1.2.1
 #####################################################
 # Set to false to acutally perform actions - Only run as DryRun when testing/troubleshooting!
 $dryRun = $false
@@ -25,10 +25,10 @@ $WarningPreference = "Continue"
 # $portalApiSecret = "" # Set from Global Variable
 
 # Exchange Online Connection Configuration
-# $EntraOrganization = "" # Set from Global Variable
-# $EntraTenantID = "" # Set from Global Variable
-# $EntraAppID = "" # Set from Global Variable
-# $EntraAppSecret = "" # Set from Global Variable
+# $EntraIdOrganization = "" # Set from Global Variable
+# $EntraIdAppId = "" # Set from Global Variable
+# $EntraIdCertificateBase64String = "" # Set from Global Variable
+# $EntraIdCertificatePassword = "" # Set from Global Variable
 $exchangeMailboxesFilter = "DisplayName -like 'shared-*'" # Optional, when no filter is provided ($exchangeMailboxesFilter = $null), all mailboxes will be queried
 
 # PowerShell commands to import
