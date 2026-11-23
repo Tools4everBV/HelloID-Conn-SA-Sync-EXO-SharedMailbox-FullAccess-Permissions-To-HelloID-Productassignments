@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com), and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [1.2.2] - 23-11-2026
+
+### Added
+- README: added best practice synchronization frequency warning. Run once; if scheduled, maximum once per month.
+
 ## [1.2.1] - 04-05-2026
 ### Changed
 - Variables on top are now also replace to certificate based.
